@@ -31,6 +31,18 @@ services:
     image: gamussa/reactive-quote-service:0.0.3
     hostname: quotes
     container_name: quotes
+
+  haproxy:
+    image: haproxy:latest
+    container_name: haproxy
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    ports:
+      - "80:80"  # Map HTTP traffic
+      # - "443:443"  # Map HTTPS traffic
+    depends_on:
+      - kong-data-plane
+
  
   # redis:
   #   image: docker.io/bitnami/redis:6.2
