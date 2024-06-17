@@ -49,3 +49,7 @@ set cluster_control_plane=control-plane:8005 		#control-plane is name of the kon
 kong reload
 
 kong restart
+
+**cd into config**
+
+deck sync --config kong.yaml
