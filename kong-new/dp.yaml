@@ -1,0 +1,81 @@
+
+version: "3.9"
+ 
+services:
+  kong-data-plane:
+    image: kong:3.6
+    hostname: kong
+    container_name: data-plane
+    user: root
+    environment:
+      KONG_DATABASE: "off"
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      # KONG_CLUSTER_CONTROL_PLANE: control-plane.kong.com:8005
+      # KONG_CLUSTER_TELEMETRY_ENDPOINT: control-plane.kong.com:8006
+      # KONG_CLUSTER_DP_LABELS: deployment:cloud1,region:us-east-1
+      KONG_PROXY_ACCESS_LOG: '/dev/stdout'
+      KONG_ADMIN_ACCESS_LOG: '/dev/stdout'
+      KONG_PROXY_ERROR_LOG: '/dev/stderr'
+      KONG_ADMIN_ERROR_LOG: '/dev/stderr'
+     # KONG_ADMIN_LISTEN: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
+    command: "kong start"
+    ports:
+      - "8100:8000"
+      - "8543:8443"
+      - "8101:8001"
+      - "8544:8444"
+    volumes:
+      - ./config:/opt/kong
+ 
+  quote-service:
+    image: gamussa/reactive-quote-service:0.0.3
+    hostname: quotes
+    container_name: quotes
+ 
+  # redis:
+  #   image: docker.io/bitnami/redis:6.2
+  #   container_name: redis
+  #   hostname: redis
+  #   restart: always
+  #   environment:
+  #     ALLOW_EMPTY_PASSWORD: "yes"
+  #     REDIS_DISABLE_COMMANDS: "FLUSHDB,FLUSHALL"
+  #   ports:
+  #     - '6379:6379'
+  #   volumes:
+  #     - 'redis_data:/bitnami/redis/data'
+
+  redis:
+    image: docker.io/bitnami/redis:6.2
+    container_name: redis
+    hostname: redis
+    restart: always
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_DISABLE_COMMANDS: "FLUSHDB,FLUSHALL"
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'redis_data:/bitnami/redis/data'
+ 
+networks:
+  default:
+    name: kong-net
+    external: true
+ 
+volumes:
+  redis_data:
+ 
+#   docker run -d --name kong-dp --network=kong-net \
+# -e "KONG_ROLE=data_plane" \
+# -e "KONG_DATABASE=off" \
+# -e "KONG_PROXY_LISTEN=0.0.0.0:8000" \
+# -e "KONG_CLUSTER_CONTROL_PLANE=control-plane.<admin-hostname>.com:8005" \
+# -e "KONG_CLUSTER_TELEMETRY_ENDPOINT=control-plane.<admin-hostname>.com:8006" \
+# -e "KONG_CLUSTER_CERT=/<path-to-file>/cluster.crt" \
+# -e "KONG_CLUSTER_CERT_KEY=/<path-to-file>/cluster.key" \
+# -e "KONG_CLUSTER_DP_LABELS=deployment:cloud1,region:us-east-1" \
+# --mount type=bind,source="$(pwd)"/cluster,target=<path-to-keys-and-certs>,readonly \
+# -p 8000:8000 \
+# kong:3.7.0-alpines
+ 
