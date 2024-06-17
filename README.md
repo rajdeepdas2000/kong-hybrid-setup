@@ -4,7 +4,7 @@ docker-compose -f cp.yaml up -d
 
 docker-compose -f dp.yaml up -d
 
-docker exec into control plane
+**docker exec into control plane**
 
 apt-get update
 
@@ -26,7 +26,8 @@ kong reload
 
 kong restart
 
-docker exec into data plane
+**docker exec into data plane**
+
 apt-get update
 
 apt-get install nano
